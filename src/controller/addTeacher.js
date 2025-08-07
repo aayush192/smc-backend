@@ -1,5 +1,5 @@
 import express from 'express';
-import { teacherModel } from '../models';
+import { teacherModel } from '../models/index.js';
 const addTeacher=async(req,res)=>{
     try{
 const {id,name,email,courses}=req.body;
@@ -18,3 +18,4 @@ res.status(200).json({success:true,result:newTeacher,message:'teacher added succ
 }
 
 }
+export default addTeacher;

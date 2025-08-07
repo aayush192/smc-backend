@@ -30,6 +30,34 @@ await getRequest.getTeacher(req,res);
         res.status(500).json({success:false,message:err.message});
     }
 })
+Router.get('/:id',async(req,res)=>{
+    try{
+await getRequest.getStudentById(req,res);
+    }catch(err){
+        res.status(500).json({success:false,message:err.message});
+    }
+})
+Router.get('/course/:id',async(req,res)=>{
+    try{
+await getRequest.getCourseById(req,res);
+    }catch(err){
+        res.status(500).json({success:false,message:err.message});
+    }
+})
+Router.get('/department/:id',async(req,res)=>{
+    try{
+await getRequest.getDepartmentById(req,res);
+    }catch(err){
+        res.status(500).json({success:false,message:err.message});
+    }
+})
+Router.get('/teacher/:id',async(req,res)=>{
+    try{
+await getRequest.getTeacherById(req,res);
+    } catch(err){
+        res.status(500).json({success:false,message:err.message});
+    }
+})
 console.log(Router);
 
 export default Router;

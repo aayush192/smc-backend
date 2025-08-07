@@ -27,7 +27,7 @@ const userModel=sequelize.define("users",{
      }
     },
     role:{
-        type:DataTypes.ENUM('superadmin','deptadmin','admin','Student'),
+        type:DataTypes.ENUM('superadmin','deptadmin','admin','student'),
         allowNull:false
     },
     password:{

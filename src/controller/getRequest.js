@@ -1,14 +1,20 @@
 import sequelize, { col } from 'sequelize';
 import { Fn } from 'sequelize/lib/utils';
-import {studentModel,attendanceModel,marksModel,teacherModel,departmentModel,courseModel} from '../models/index.js';
+import {studentModel,attendanceModel,marksModel,teacherModel,departmentModel,courseModel, userModel} from '../models/index.js';
 import { response } from 'express';
 export default class GetRequest{
     //get request
 async getStudent(req,res){
     try{
-        const limit = parseInt(req.query.limit) || 10;
-    const response=await studentModel.findAll({
+        const limit = parseInt(req.query.limit) || 20;
+    const response=await userModel.findAll({
         limit,
+        where:{
+            role:'student'
+        },
+      include:[
+        {model:studentModel}
+      ]
     })
     res.status(200).json({success:true,result:response,message:'student retrieval is successful'});
 }catch(err){
@@ -50,7 +56,7 @@ async getTeacher(req,res){
 
 
 //get request by id
-async getDepartmentByid(req,res){
+async getDepartmentById(req,res){
     try{
         const id=req.params;
 const departmentResponse= await departmentModel.findByPk(id,
@@ -84,7 +90,10 @@ res.status(500).json({success:false,message:err.message});
 async getStudentById(req,res){
     try{
 const id=req.params;
-const studentResponse=await studentModel.findByPk(id);
+const studentResponse=await userModel.findByPk(id,{
+    include:[{model:studentModel}]
+}
+);
 if(!studentResponse){
     res.status(400).json({success:false,message:'student not found'});
     return;
@@ -94,15 +103,25 @@ const attendanceResponse=await attendanceModel.findAll({
     where:{
         studentid:id,
     },
-    attributes:['status',[fn('COUNT',col('status')),'count']],
-    group:['status']
+    attributes:['status','courseId',[fn('COUNT',col('status')),'count']],
+    group:['status','courseId'],
+    include:[{model:courseModel,
+        attributes:'courseTitle',
+    }]
 })
-const attendenceSummary={present:0,abscent:0};
-attendanceResponse.forEach((state)=>{
-    const status=state.getDataValue('status');
-    const count=state.parseInt(getDataValue('count'));
-    attendenceSummary[status]=count;
-})
+const attendanceSummary = {};
+
+attendanceResponse.forEach((state) => {
+  const course = state.course?.courseTitle || 'Unknown Course';
+  const status = state.getDataValue('status');
+  const count = parseInt(state.getDataValue('count'), 10);
+
+  if (!attendanceSummary[course]) {
+    attendanceSummary[course] = {};
+  }
+
+  attendanceSummary[course][status] = count;
+});
 
 const marksResponse=await marksModel.findAll({
     where:{

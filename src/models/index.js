@@ -43,6 +43,9 @@ courseModel.belongsToMany(studentModel, { through: 'enrollments' });
 studentModel.hasMany(attendanceModel,{foreignKey:'studentid',onDelete:'CASCADE'});
 attendanceModel.belongsTo(studentModel,{foreignKey:'studentid'});
 
+courseModel.hasMany(attendanceModel,{foreignKey:'courseId',onDelete:'CASCADE'});
+attendanceModel.belongsTo(courseModel,{foreignKey:'courseId'})
+
 studentModel.hasMany(marksModel,{foreignKey:'studentId',onDelete:'CASCADE'});
 marksModel.belongsTo(studentModel,{foreignKey:'studentId'});
 

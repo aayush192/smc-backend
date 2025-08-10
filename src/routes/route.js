@@ -9,6 +9,13 @@ await getRequest.getStudent(req,res);
         res.status(500).json({success:false,message:err.message});
     }
 })
+Router.get('/studentAttendence',async(req,res)=>{
+    try{
+await getRequest.getStudentByDepartmentAndSemester(req,res);
+    }catch(err){
+        res.status(500).json({success:false,message:err.message});
+    }
+})
 Router.get('/course',async(req,res)=>{
     try{
 await getRequest.getCourse(req,res);

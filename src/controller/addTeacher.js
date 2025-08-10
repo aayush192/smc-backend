@@ -2,9 +2,8 @@ import express from 'express';
 import { teacherModel } from '../models/index.js';
 const addTeacher=async(req,res)=>{
     try{
-const {id,name,email,courses}=req.body;
+const {name,email,courses}=req.body;
 const newTeacher=await teacherModel.create({
-    id,
     name,
     email
 });

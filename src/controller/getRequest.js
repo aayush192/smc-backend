@@ -2,6 +2,8 @@ import sequelize, { col } from 'sequelize';
 import { Fn } from 'sequelize/lib/utils';
 import {studentModel,attendanceModel,marksModel,teacherModel,departmentModel,courseModel, userModel} from '../models/index.js';
 import { response } from 'express';
+import getIdByName from './getIdByName.js';
+const getId=new getIdByName;
 export default class GetRequest{
     //get request
 async getStudent(req,res){
@@ -14,6 +16,28 @@ async getStudent(req,res){
         },
       include:[
         {model:studentModel}
+      ]
+    })
+    res.status(200).json({success:true,result:response,message:'student retrieval is successful'});
+}catch(err){
+    res.status(500).json({success:false,message:err.message});
+}
+}
+
+async getStudentByDepartmentAndSemester(req,res){
+    const {departmentName,semester}=req.body;
+    if( !departmentName||!semester) return res.status(400).json({success:false,message:'provide all required data'});
+    try{
+
+    const departmentId=getId.getIdByDepartmentName(departmentName);
+    const response=await studentModel.findAll({
+        limit,
+        where:{
+            departmentId,
+            semester
+        },
+      include:[
+        {model:userModel}
       ]
     })
     res.status(200).json({success:true,result:response,message:'student retrieval is successful'});

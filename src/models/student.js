@@ -7,9 +7,10 @@ const studentModel=sequelize.define("student",{
         primaryKey:true,
        references:{model:'users',key:'id'}
     },
-    rollno:{
+    symbolno:{
         type:DataTypes.INTEGER,
-        allowNull:true,
+        allowNull:false,
+        unique:true
     },
     semester:{
         type:DataTypes.STRING,

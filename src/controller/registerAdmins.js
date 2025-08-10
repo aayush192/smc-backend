@@ -1,28 +1,33 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import {userModel,adminsModel} from '../models/index.js';
+import getIdByName from './getIdByName.js';
 const registeradmins=async(req,res)=>{
-    const {name,phone,gender,email,departmentId,role,password}=req.body;
+    const getId=new getIdByName;
+    const {name,phone,gender,email,departmentName,role,password}=req.body;
     try{
         if(role !=='admin') {
-            return res.status(400).json({success:false,message:'only department admin role allowed here'});
+            return res.status(400).json({success:false,message:'only admin role allowed here'});
         }
-        if (!name || !email || !password || !departmentId) {
+        if (!name || !email || !password || !departmentName) {
             return res.status(400).json({ success: false, message: 'Missing required fields' });
           }
-
+     const trimmedEmail=email.trim().toLowerCase();
      const checkUser=await userModel.findOne({where:{
-        email,
+        email:trimmedEmail,
      }})
      if(checkUser){
         return res.status(400).json({success:false,message:'user already exists'});
      }
+     
+    const departmentId=await getId.getIdByDepartmentName(departmentName);
+
     const hashedPassword=await bcrypt.hash(password,10);
     const newUser=await userModel.create({
         name,
         phone,
         gender,
-        email,
+        email:trimmedEmail,
         role,
         password:hashedPassword,
     });

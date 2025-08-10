@@ -8,6 +8,7 @@ import courseModel from './course.js';
 import userModel from './user.js';
 import deptAdminModel from './deptAdminModel.js';
 import adminsModel from './adminsModel.js';
+import deptCourses from './deptCourse.js';
 
 // ✅ Setup associations here
 userModel.hasOne(studentModel, { foreignKey: "userId", onDelete: "CASCADE" });
@@ -27,9 +28,6 @@ deptAdminModel.belongsTo(userModel, { foreignKey: "userId" });
 
 departmentModel.belongsToMany(courseModel, { through:'deptCourses' });
 courseModel.belongsToMany(departmentModel, { through:'deptCourses' });
-
-departmentModel.hasMany(courseModel, { foreignKey: 'departmentId' });
-courseModel.belongsTo(departmentModel, { foreignKey: 'departmentId' });
 
 departmentModel.hasMany(attendanceModel,{foreignKey:'departmentid'});
 attendanceModel.belongsTo(departmentModel,{foreignKey:'departmentid'});
@@ -64,5 +62,6 @@ export {
   courseModel,
   userModel,
   deptAdminModel,
-  adminsModel
+  adminsModel,
+  deptCourses
 };

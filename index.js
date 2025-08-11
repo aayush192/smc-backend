@@ -7,6 +7,7 @@ import updateRouter from './src/routes/updateRoute.js';
 import {studentModel,courseModel,attendanceModel,marksModel,teacherModel,departmentModel,userModel,deptAdminModel,adminsModel} from './src/models/index.js';
 import sequelize from './src/connection/sequelize.js';
 import addRouter from './src/routes/addRoute.js';
+import auth from './src/controller/auth.js';
 const app=express();
 app.use(cors());
 app.use(helmet());
@@ -15,6 +16,7 @@ app.use('/',Router);
 app.use('/register',registerRouter);
 app.use('/add',addRouter);
 app.use('/update',updateRouter);
+app.post('/auth',auth)
 app.listen(8000,async()=>{
    await sequelize.authenticate();
    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');

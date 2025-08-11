@@ -63,3 +63,4 @@ Endpoint	Method	Description
 /api/courses	POST	Create a new course
 /api/enroll	POST	Enroll a student in a course
 /api/grades	PUT	Update student grades
+# smc-backend

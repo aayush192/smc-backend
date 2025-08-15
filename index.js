@@ -8,15 +8,16 @@ import {studentModel,courseModel,attendanceModel,marksModel,teacherModel,departm
 import sequelize from './src/connection/sequelize.js';
 import addRouter from './src/routes/addRoute.js';
 import auth from './src/controller/auth.js';
+import validateToken from './src/middleware/validateToken.js';
 const app=express();
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use('/',Router);
 app.use('/register',registerRouter);
-app.use('/add',addRouter);
-app.use('/update',updateRouter);
-app.post('/auth',auth)
+app.use('/add',validateToken,addRouter);
+app.use('/update',validateToken,updateRouter);
+app.post('/auth',auth);
 app.listen(8000,async()=>{
    await sequelize.authenticate();
    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');

@@ -1,22 +1,33 @@
 import sequelize, { col } from 'sequelize';
 import { Fn } from 'sequelize/lib/utils';
-import {studentModel,attendanceModel,marksModel,teacherModel,departmentModel,courseModel, userModel} from '../models/index.js';
+import {studentModel,attendanceModel,marksModel,teacherModel,departmentModel,courseModel, userModel, adminsModel, deptAdminModel} from '../models/index.js';
 import { response } from 'express';
 import getIdByName from './getIdByName.js';
 const getId=new getIdByName;
 export default class GetRequest{
     //get request
-async getStudent(req,res){
+async getProfile(req,res){
     try{
-        const limit = parseInt(req.query.limit) || 20;
-    const response=await userModel.findAll({
-        limit,
+    const {id,role}=req.user;
+    let includeModel;
+    switch (role) {
+      case 'student':
+        includeModel = { model: studentModel };
+        break;
+      case 'admin':
+        includeModel = { model: adminsModel };
+        break;
+      case 'deptAdmin':
+        includeModel = { model: deptAdminModel };
+        break;
+      default:
+        includeModel = null; // No extra model for unknown roles
+    }
+    const response=await userModel.findOne({
         where:{
-            role:'student'
+            id,
         },
-      include:[
-        {model:studentModel}
-      ]
+      include:includeModel?[includeModel]:[]
     })
     res.status(200).json({success:true,result:response,message:'student retrieval is successful'});
 }catch(err){
@@ -168,8 +179,14 @@ res.status(200).json({success:true,result:{studentResponse,attendenceSummary,mar
 async getTeacherById(req, res) {
     try {
       const id = req.params.id;
-      const teacher = await teacherModel.findByPk(id);  // find by primary key
-  
+      const teacher = await teacherModel.findByPk(id,
+        {
+            include:[{model:courseModel,
+                through:{attributes:[]}
+            }]
+        }
+      );  // find by primary key
+      
       if (!teacher) {
         return res.status(404).json({ success: false, message: 'Teacher not found' });
       }
@@ -179,5 +196,26 @@ async getTeacherById(req, res) {
       res.status(500).json({ success: false, message: err.message });
     }
   }
+
+async getResultByID(req,res){
+const id=req.params;
+const {semester}=req.body;
+if(!id || !semester) return res.status(400).json({success:false,message:'provide all required data'});
+try{
+const checkIfExist=await userModel.findByPk(id);
+if(!checkIfExist) return res.status(400).json({success:false,message:'user doesnot exist'});
+else if(checkIfExist.role!='student')return res.status(400).json({success:false,message:'user is not student'});
+
+const response=await marksModel.findAll({where:{
+    studentId:id,
+    semester
+}
+})
+if(!response) return res.status(400).json({success:false,message:"result doesn't exist"});
+res.status(200).json({success:true,result:response,message:"result fetched successfully"});
+}catch(err){
+    res.status(500).json({success:false,message:err.message});
+}
+}
   
 }

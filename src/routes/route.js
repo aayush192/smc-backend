@@ -1,15 +1,17 @@
 import express from 'express';
 import GetRequest from '../controller/getRequest.js';
+import authorize from '../middleware/authorize.js';
+import validateToken from '../middleware/validateToken.js';
 const getRequest=new GetRequest();
 const Router=express.Router();
-Router.get('/',async(req,res)=>{
+Router.get('/',validateToken,async(req,res)=>{
     try{
-await getRequest.getStudent(req,res);
+await getRequest.getProfile(req,res);
     }catch(err){
         res.status(500).json({success:false,message:err.message});
     }
 })
-Router.get('/studentAttendence',async(req,res)=>{
+Router.get('/studentAttendence',validateToken,authorize('superadmin','deptadmin','admin'),async(req,res)=>{
     try{
 await getRequest.getStudentByDepartmentAndSemester(req,res);
     }catch(err){
@@ -61,6 +63,13 @@ await getRequest.getDepartmentById(req,res);
 Router.get('/teacher/:id',async(req,res)=>{
     try{
 await getRequest.getTeacherById(req,res);
+    } catch(err){
+        res.status(500).json({success:false,message:err.message});
+    }
+})
+Router.put('/result/:id',async(req,res)=>{
+    try{
+await getRequest.getResultByID(req,res);
     } catch(err){
         res.status(500).json({success:false,message:err.message});
     }

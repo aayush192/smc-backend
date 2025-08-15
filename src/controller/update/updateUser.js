@@ -4,7 +4,7 @@ import getIdByName from '../getIdByName.js';
 import bcrypt from 'bcrypt';
 const updateUser=async(req,res)=>{
 const getId=new getIdByName;
-
+const requestUserRole=req.user.role;
 const {id,name,phone,gender,email,departmentName,role,rollno,semester}=req.body;
 if( !id  || !name || !phone || !gender || !email || !departmentName || !role) return res.status(400).json({success:false,message:'provide all required data'});
 try{
@@ -21,7 +21,7 @@ role
 }}
 );
 let extraUpdate;
-if(role=='student'){
+if(role=='student' && (requestUserRole=='superadmin' || requestUserRole=='deptadmin')){
     if(!departmentId || !rollno || !semester) return res.status(400).json({success:false,message:'provide all required data'});
 extraUpdate=await studentModel.update({
     rollno,
@@ -31,12 +31,12 @@ extraUpdate=await studentModel.update({
     userId:id}
  })
 }
-else if(role=='deptadmin'){
+else if(role=='deptadmin' && requestUserRole=='superadmin'){
 extraUpdate=await deptAdminModel.update({
     departmentId,
 },{where:{userId:id}})
 }
-else if(role=='admin'){
+else if(role=='admin' && (requestUserRole=='superadmin' || requestUserRole=='deptadmin')){
 extraUpdate=await adminsModel.update({
     departmentId,
 },{where:{userId:id}})
